@@ -279,14 +279,12 @@ case "$run_mode" in
         else
         logger -t "SS" "cdn域名文件下载成功"
 		fi
-		logger -st "SS" "启动chinadns..."
-		dns2tcp -L"127.0.0.1#5353" -R"$(nvram get tunnel_forward)" >/dev/null 2>&1 &
-		chinadns-ng -b 0.0.0.0 -l 65353 -c $(nvram get china_dns) -t 127.0.0.1#5353 -4 china -m /tmp/cdn.txt >/dev/null 2>&1 &
+		logger -st "SS" "启动smartdns..."
 	sed -i '/no-resolv/d' /etc/storage/dnsmasq/dnsmasq.conf
 sed -i '/server=127.0.0.1/d' /etc/storage/dnsmasq/dnsmasq.conf
 cat >> /etc/storage/dnsmasq/dnsmasq.conf << EOF
 no-resolv
-server=127.0.0.1#65353
+server=127.0.0.1#5353
 EOF
     fi
 	;;
@@ -314,13 +312,6 @@ EOF
 	*)
 		ipset -N ss_spec_wan_ac hash:net 2>/dev/null
 		ipset add ss_spec_wan_ac $dnsserver 2>/dev/null
-		sed -i '/no-resolv/d' /etc/storage/dnsmasq/dnsmasq.conf
-		sed -i '/server=127.0.0.1/d' /etc/storage/dnsmasq/dnsmasq.conf
-		cat >> /etc/storage/dnsmasq/dnsmasq.conf << EOF
-no-resolv
-server=127.0.0.1#6053
-EOF
-	logger -t "SmartDNS" "添加DNS转发到6053端口"
 	;;
 	esac
 	/sbin/restart_dhcpd
