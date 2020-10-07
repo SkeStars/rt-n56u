@@ -314,6 +314,13 @@ EOF
 	*)
 		ipset -N ss_spec_wan_ac hash:net 2>/dev/null
 		ipset add ss_spec_wan_ac $dnsserver 2>/dev/null
+		sed -i '/no-resolv/d' /etc/storage/dnsmasq/dnsmasq.conf
+		sed -i '/server=127.0.0.1/d' /etc/storage/dnsmasq/dnsmasq.conf
+		cat >> /etc/storage/dnsmasq/dnsmasq.conf << EOF
+no-resolv
+server=127.0.0.1#6053
+EOF
+	logger -t "SmartDNS" "添加DNS转发到6053端口"
 	;;
 	esac
 	/sbin/restart_dhcpd
